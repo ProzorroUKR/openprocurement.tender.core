@@ -60,11 +60,11 @@ class TestItemValidation(unittest.TestCase):
     def test_validate_item_classification(self):
         self.tender.get.return_value = []
 
-        if get_now() > GROUP_336_FROM:
-            # for 336 code group
-            with self.assertRaises(ValidationError) as e:
-                self.model.validate_additionalClassifications(self.data, [])
-            self.assertEqual(e.exception.message, [u"This field is required."])
+        # if get_now() > GROUP_336_FROM:
+        #     # for 336 code group
+        #     with self.assertRaises(ValidationError) as e:
+        #         self.model.validate_additionalClassifications(self.data, [])
+        #     self.assertEqual(e.exception.message, [u"This field is required."])
  
         self.tender.get.return_value = [self.date_mock]
         if get_now() > GROUP_336_FROM:
