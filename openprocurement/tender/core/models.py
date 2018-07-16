@@ -294,7 +294,7 @@ class Item(BaseItem):
         not_cpv = data['classification']['id'] == '99999999-9'
         required = tender_date < NOT_REQUIRED_ADDITIONAL_CLASSIFICATION_FROM and not_cpv
         inn = data['classification']['id'].startswith('336') and data['classification']['id'] != '33695000-8'
-        if not items and (not tender_from_2017 or tender_from_2017 and not_cpv and required or tender_from_inn and inn):
+        if not items and (not tender_from_2017 or tender_from_2017 and not_cpv and required):
             raise ValidationError(u'This field is required.')
         elif tender_from_2017 and not_cpv and items and not any([i.scheme in ADDITIONAL_CLASSIFICATIONS_SCHEMES_2017 for i in items]):
             raise ValidationError(u"One of additional classifications should be one of [{0}].".format(', '.join(ADDITIONAL_CLASSIFICATIONS_SCHEMES_2017)))

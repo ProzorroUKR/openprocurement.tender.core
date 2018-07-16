@@ -60,12 +60,11 @@ class TestItemValidation(unittest.TestCase):
     def test_validate_item_classification(self):
         self.tender.get.return_value = []
 
+        # for 336 code group "This field is required." raises only after 2017
         if get_now() > GROUP_336_FROM:
-            # for 336 code group
-            with self.assertRaises(ValidationError) as e:
-                self.model.validate_additionalClassifications(self.data, [])
-            self.assertEqual(e.exception.message, [u"This field is required."])
- 
+            self.model.validate_additionalClassifications(self.data, [])
+
+        self.date_mock.date = datetime(2016, 3, 1, tzinfo=TZ)
         self.tender.get.return_value = [self.date_mock]
         if get_now() > GROUP_336_FROM:
             with self.assertRaises(ValidationError) as e:
@@ -77,7 +76,6 @@ class TestItemValidation(unittest.TestCase):
         self.assertEqual(e.exception.message, [u"One of additional classifications should be one of [{0}].".format(
             ', '.join(ADDITIONAL_CLASSIFICATIONS_SCHEMES))])
 
-        self.date_mock.date.return_value = datetime(2017, 3, 1, tzinfo=TZ)
         self.tender.get.return_value = False
         if get_now() > GROUP_336_FROM:
             with self.assertRaises(ValidationError) as e:
