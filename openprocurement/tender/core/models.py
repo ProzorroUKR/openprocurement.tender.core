@@ -837,6 +837,7 @@ class Tender(BaseTender):
     eligibilityCriteria_en = StringType()
     eligibilityCriteria_ru = StringType()
     status = StringType(choices=['draft', 'active.enquiries', 'active.tendering', 'active.auction', 'active.qualification', 'active.awarded', 'complete', 'cancelled', 'unsuccessful'], default='active.enquiries')
+    mainProcurementCategory = StringType(choices=["goods", "services", "works"])
 
     create_accreditation = 1
     edit_accreditation = 2
