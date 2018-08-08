@@ -18,7 +18,6 @@ from openprocurement.api.models import (
     IsoDateTimeType, ListType, Document as BaseDocument, CPVClassification,
     Location, Contract as BaseContract, Value,
     PeriodEndRequired as BasePeriodEndRequired,
-    Address
 )
 from openprocurement.api.models import Item as BaseItem
 from openprocurement.api.models import (
@@ -265,6 +264,10 @@ class Item(BaseItem):
             raise ValidationError(u"relatedLot should be one of lots")
 
 
+class ContractValue(Value):
+    amountNet = FloatType(min_value=0)
+
+
 class Contract(BaseContract):
     class Options:
         roles = {
@@ -274,7 +277,7 @@ class Contract(BaseContract):
             'view': schematics_default_role,
         }
 
-    value = ModelType(Value)
+    value = ModelType(ContractValue)
     awardID = StringType(required=True)
     documents = ListType(ModelType(Document), default=list())
 
