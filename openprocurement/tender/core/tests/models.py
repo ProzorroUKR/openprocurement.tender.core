@@ -4,7 +4,7 @@ from mock import patch, MagicMock
 from datetime import datetime, timedelta, time
 from schematics.exceptions import ModelValidationError
 from openprocurement.tender.core.models import (
-    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question
+    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question, BaseTender
 )
 from openprocurement.api.constants import TZ
 
@@ -161,7 +161,7 @@ class TestQuestionModel(unittest.TestCase):
 class TestTenderMainProcurementCategory(unittest.TestCase):
 
     def test_validate_valid(self):
-        tender = Tender(
+        tender = BaseTender(
             {
                 "title": "whatever",
                 "mainProcurementCategory": "goods",
@@ -173,7 +173,7 @@ class TestTenderMainProcurementCategory(unittest.TestCase):
         self.assertIn(data["mainProcurementCategory"], "goods")
 
     def test_validate_not_valid(self):
-        tender = Tender(
+        tender = BaseTender(
             {
                 "title": "whatever",
                 "mainProcurementCategory": "test",
@@ -188,7 +188,7 @@ class TestTenderMainProcurementCategory(unittest.TestCase):
         )
 
     def test_validate_empty(self):
-        tender = Tender({"title": "whatever"})
+        tender = BaseTender({"title": "whatever"})
         tender.validate()
         data = tender.serialize("embedded")
         self.assertNotIn("mainProcurementCategory", data)

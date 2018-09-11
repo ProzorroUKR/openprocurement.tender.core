@@ -786,6 +786,7 @@ class BaseTender(SchematicsDocument, Model):
     if SANDBOX_MODE:
         procurementMethodDetails = StringType()
     funders = ListType(ModelType(Organization), validators=[validate_funders_unique, validate_funders_ids])
+    mainProcurementCategory = StringType(choices=["goods", "services", "works"])
 
     _attachments = DictType(DictType(BaseType), default=dict())  # couchdb attachments
     revisions = ListType(ModelType(Revision), default=list())
@@ -837,7 +838,6 @@ class Tender(BaseTender):
     eligibilityCriteria_en = StringType()
     eligibilityCriteria_ru = StringType()
     status = StringType(choices=['draft', 'active.enquiries', 'active.tendering', 'active.auction', 'active.qualification', 'active.awarded', 'complete', 'cancelled', 'unsuccessful'], default='active.enquiries')
-    mainProcurementCategory = StringType(choices=["goods", "services", "works"])
 
     create_accreditation = 1
     edit_accreditation = 2
