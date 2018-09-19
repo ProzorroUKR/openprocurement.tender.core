@@ -4,7 +4,7 @@ from mock import patch, MagicMock
 from datetime import datetime, timedelta, time
 from schematics.exceptions import ModelValidationError
 from openprocurement.tender.core.models import (
-    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question
+    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question, BaseTender
 )
 from openprocurement.api.constants import TZ
 
@@ -156,6 +156,42 @@ class TestQuestionModel(unittest.TestCase):
             "active.pre-qualification.stand-still")
         self.assertEqual(serialized_question['questionOf'], 'tender')
         self.assertEqual(len(serialized_question['id']), 32)
+
+
+class TestTenderMainProcurementCategory(unittest.TestCase):
+
+    def test_validate_valid(self):
+        tender = BaseTender(
+            {
+                "title": "whatever",
+                "mainProcurementCategory": "goods",
+            }
+        )
+        tender.validate()
+        data = tender.serialize("embedded")
+        self.assertIn("mainProcurementCategory", data)
+        self.assertIn(data["mainProcurementCategory"], "goods")
+
+    def test_validate_not_valid(self):
+        tender = BaseTender(
+            {
+                "title": "whatever",
+                "mainProcurementCategory": "test",
+            }
+        )
+        with self.assertRaises(ModelValidationError) as e:
+            tender.validate()
+
+        self.assertEqual(
+            e.exception.message,
+            {'mainProcurementCategory':  [u"Value must be one of ['goods', 'services', 'works']."]}
+        )
+
+    def test_validate_empty(self):
+        tender = BaseTender({"title": "whatever"})
+        tender.validate()
+        data = tender.serialize("embedded")
+        self.assertNotIn("mainProcurementCategory", data)
 
 
 def suite():
