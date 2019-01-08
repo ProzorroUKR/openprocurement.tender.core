@@ -4,8 +4,8 @@ from mock import patch, MagicMock
 from datetime import datetime, timedelta, time
 from schematics.exceptions import ModelValidationError
 from openprocurement.tender.core.models import (
-    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question
-)
+    PeriodEndRequired, get_tender, Tender, TenderAuctionPeriod, Question,
+    BidOrganization)
 from openprocurement.api.constants import TZ
 
 
@@ -190,6 +190,52 @@ class TestTenderMainProcurementCategory(unittest.TestCase):
         tender.validate()
         data = tender.serialize("embedded")
         self.assertNotIn("mainProcurementCategory", data)
+
+
+class TestScale(unittest.TestCase):
+    organization_data = {
+        "contactPoint": {
+            "email": "john.doe@example.com",
+            "name": "John Doe"
+        },
+        "identifier": {
+            "scheme": "UA-EDR",
+            "id": "00137256",
+        },
+        "name": "John Doe LTD",
+        "address": {
+            "countryName": "Ukraine",
+        }
+    }
+
+    def test_validate_valid(self):
+        organization = BidOrganization(
+            dict(scale="micro", **self.organization_data)
+        )
+        organization.validate()
+        data = organization.serialize("embedded")
+        self.assertIn("scale", data)
+        self.assertIn(data["scale"], "micro")
+
+    def test_validate_not_valid(self):
+        organization = BidOrganization(
+            dict(scale="giant", **self.organization_data)
+        )
+        with self.assertRaises(ModelValidationError) as e:
+            organization.validate()
+        self.assertEqual(
+            e.exception.message,
+            {'scale': [u"Value must be one of ['micro', 'sme', 'mid', 'large']."]}
+        )
+
+    def test_validate_required(self):
+        organization = BidOrganization(self.organization_data)
+        with self.assertRaises(ModelValidationError) as e:
+            organization.validate()
+        self.assertEqual(
+            e.exception.message,
+            {'scale': [u'This field is required.']}
+        )
 
 
 def suite():

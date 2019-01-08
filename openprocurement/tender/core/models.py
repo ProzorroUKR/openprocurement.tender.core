@@ -32,7 +32,7 @@ from openprocurement.api.constants import (
     ADDITIONAL_CLASSIFICATIONS_SCHEMES,
     ADDITIONAL_CLASSIFICATIONS_SCHEMES_2017,
     FUNDERS, NOT_REQUIRED_ADDITIONAL_CLASSIFICATION_FROM,
-)
+    SCALE_CODES)
 
 from openprocurement.tender.core.constants import (
     CANT_DELETE_PERIOD_START_DATE_FROM,
@@ -336,6 +336,10 @@ class Parameter(Model):
                 raise ValidationError(u"value should be one of feature value.")
 
 
+class BidOrganization(Organization):
+    scale = StringType(choices=SCALE_CODES, required=True)
+
+
 class Bid(Model):
     class Options:
         roles = {
@@ -360,7 +364,7 @@ class Bid(Model):
     def __local_roles__(self):
         return dict([('{}_{}'.format(self.owner, self.owner_token), 'bid_owner')])
 
-    tenderers = ListType(ModelType(Organization), required=True, min_size=1, max_size=1)
+    tenderers = ListType(ModelType(BidOrganization), required=True, min_size=1, max_size=1)
     parameters = ListType(ModelType(Parameter), default=list(), validators=[validate_parameters_uniq])
     lotValues = ListType(ModelType(LotValue), default=list())
     date = IsoDateTimeType(default=get_now)
